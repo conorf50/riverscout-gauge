@@ -23,7 +23,6 @@ from onewire import DS18X20 # driver for the temperature sensor
 from onewire import OneWire # onewire driver for DS18B20 driver above
 import socket # sigfox
 import struct # compression of float values
-import sys 
 
 # init Sigfox for RCZ1 (Europe)
 sigfox = Sigfox(mode=Sigfox.SIGFOX, rcz=Sigfox.RCZ1)
@@ -36,22 +35,17 @@ s.setsockopt(socket.SOL_SIGFOX, socket.SO_RX, False)
 
 #DS18B20 temp sensor data line (yellow wire) connected to pin P8 (G15 on Expansion Board)
 ow = OneWire(Pin('P8'))
-temp = DS18X20(ow) 
-temp.start_conversion()
-time.sleep(1)
-temp = round(temp.read_temp_async(), 2)
-
-print("Temp =")
-print(float(temp))
+# temp = DS18X20(ow) 
+# temp.start_conversion()
 # time.sleep(1)
-ow.reset()
+# temp = round(temp.read_temp_async(), 2)
+
+# print("Temp =")
+# print(float(temp))
+# time.sleep(1)
 # # 'f' = float value
 
-try:
-    print("sending data")
+print("sending data")
     # 'f' = float value, 'i' = unsigned integer
     #s.send(struct.pack('f',float(12.3)) + struct.pack('i', int(1020)))
-    #s.send(struct.pack('f',float(34.134)) + bytes([12]))
-except Exception:
-    print(Exception)    
-    sys.exit(0)
+s.send(struct.pack('f',float(34.1)) + bytes([12]))
