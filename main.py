@@ -17,10 +17,10 @@ Modified code available at: https://github.com/conorf50/pycom-us100
 '''
 
 from network import Sigfox # sigfox libs
-#import time 
-# from machine import Pin # listings for device pins
-# from onewire import DS18X20 # driver for the temperature sensor
-# from onewire import OneWire # onewire driver for DS18B20 driver above
+import time 
+from machine import Pin # listings for device pins
+from onewire import DS18X20 # driver for the temperature sensor
+from onewire import OneWire # onewire driver for DS18B20 driver above
 import socket # sigfox
 import struct # compression of float values
 import sys 
@@ -34,19 +34,24 @@ s.setblocking(True)
 # configure it as uplink only
 s.setsockopt(socket.SOL_SIGFOX, socket.SO_RX, False)
 
-#DS18B20 temp sensor data line (yellow wire) connected to pin P10 (G17 on Expansion Board)
-# ow = OneWire(Pin('P10'))
-# temp = DS18X20(ow) 
-# temp.start_conversion()
-# time.sleep(1)
-# temp = round(temp.read_temp_async(), 2)
+#DS18B20 temp sensor data line (yellow wire) connected to pin P8 (G15 on Expansion Board)
+ow = OneWire(Pin('P8'))
+temp = DS18X20(ow) 
+temp.start_conversion()
+time.sleep(1)
+temp = round(temp.read_temp_async(), 2)
 
 print("Temp =")
-# print(float(temp))
-time.sleep(1)
-# 'f' = float value
-# s.send(struct.pack('f',float(34.134)) + bytes([12]))
-print("sending data")
-s.send(bytes([0x01, 0x02, 0x03]))
-#s.send(struct.pack('f',float(34.42)) + bytes([12]))
-print("done")
+print(float(temp))
+# time.sleep(1)
+ow.reset()
+# # 'f' = float value
+
+try:
+    print("sending data")
+    # 'f' = float value, 'i' = unsigned integer
+    #s.send(struct.pack('f',float(12.3)) + struct.pack('i', int(1020)))
+    #s.send(struct.pack('f',float(34.134)) + bytes([12]))
+except Exception:
+    print(Exception)    
+    sys.exit(0)
