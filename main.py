@@ -18,6 +18,10 @@ Modified code available at: https://github.com/conorf50/pycom-us100
 
 from network import Sigfox # sigfox libs
 import time 
+from machine import UART
+import utime
+import us100
+import pycom
 from machine import Pin # listings for device pins
 from machine import ADC # 'substitute' for a temp sensor by using a pot connected to the ADC
 from onewire import DS18X20 # driver for the temperature sensor
@@ -40,6 +44,15 @@ s.setsockopt(socket.SOL_SIGFOX, socket.SO_RX, False)
 # this means the max value will be 4095 at 3.3v
 #adc_c = adc.channel(pin='P13', attn=ADC.ATTN_11DB)
 
+
+# The SiPy has two serial ports, one is used to communicate with the computer
+# the second is used here
+
+# Configure second UART bus on pins P3(TX1) and P4(RX1). Refer to datasheet if in doubt
+uart1 = machine.UART(1, baudrate=9600)
+sensor = us100.US100UART(uart1)
+
+
 #DS18B20 temp sensor data line (yellow wire) connected to pin P8 (G15 on Expansion Board)
 ow = OneWire(Pin('P8')) # breaks Sigfox connectivity
 temp = DS18X20(ow) 
@@ -49,10 +62,15 @@ temp = round(temp.read_temp_async(), 2)
 
 # take the value from the ADC, divide it by 100 to get a float value and round this to two decimal places
 #tempVal = round(adc_c.value()/100, 2)
+
+# get the distance in millimeters from the sensor
+#waterLevel = sensor.distance()
+
 print("Temp =")
 #print(tempVal) # scale the value down to a more realistic level
 print(float(temp))
-# time.sleep(1)
+print("Water Level = ")
+print(sensor.distance())
 # # 'f' = float value
 #adc.deinit()
 print("sending data")
