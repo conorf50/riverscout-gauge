@@ -35,23 +35,27 @@ s.setblocking(True)
 s.setsockopt(socket.SOL_SIGFOX, socket.SO_RX, False)
 
 # init the ADC
-adc = ADC(0)
-adc_c = adc.channel(pin='P13')
-#DS18B20 temp sensor data line (yellow wire) connected to pin P8 (G15 on Expansion Board)
-#ow = OneWire(Pin('P8')) # breaks Sigfox connectivity
-# temp = DS18X20(ow) 
-# temp.start_conversion()
-# time.sleep(1)
-# temp = round(temp.read_temp_async(), 2)
+#adc = ADC(0)
+# set up the ADC on pin 13 with an 11db attenuation factor 
+# this means the max value will be 4095 at 3.3v
+#adc_c = adc.channel(pin='P13', attn=ADC.ATTN_11DB)
 
-value = adc_c.value()
+#DS18B20 temp sensor data line (yellow wire) connected to pin P8 (G15 on Expansion Board)
+ow = OneWire(Pin('P8')) # breaks Sigfox connectivity
+temp = DS18X20(ow) 
+temp.start_conversion()
+time.sleep(1)
+temp = round(temp.read_temp_async(), 2)
+
+# take the value from the ADC, divide it by 100 to get a float value and round this to two decimal places
+#tempVal = round(adc_c.value()/100, 2)
 print("Temp =")
-print(value)
-# print(float(temp))
+#print(tempVal) # scale the value down to a more realistic level
+print(float(temp))
 # time.sleep(1)
 # # 'f' = float value
-
+#adc.deinit()
 print("sending data")
     # 'f' = float value, 'i' = unsigned integer
     #s.send(struct.pack('f',float(12.3)) + struct.pack('i', int(1020)))
-#s.send(struct.pack('f',float(34.1)) + bytes([12]))
+s.send(struct.pack('f',float(temp)) + bytes([12]))
