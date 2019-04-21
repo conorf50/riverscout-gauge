@@ -33,7 +33,7 @@ sigfox = Sigfox(mode=Sigfox.SIGFOX, rcz=Sigfox.RCZ1)
 # create a Sigfox socket
 s = socket.socket(socket.AF_SIGFOX, socket.SOCK_RAW)
 # make the socket blocking
-s.setblocking(False)
+s.setblocking(True)
 # configure it as uplink only
 s.setsockopt(socket.SOL_SIGFOX, socket.SO_RX, False)
 
@@ -42,8 +42,8 @@ s.setsockopt(socket.SOL_SIGFOX, socket.SO_RX, False)
 # the second is used here
 
 # Configure second UART bus on pins P3(TX1) and P4(RX1). Refer to datasheet if in doubt
-uart1 = machine.UART(1, baudrate=9600)
-sensor = us100.US100UART(uart1)
+# uart1 = machine.UART(1, baudrate=9600)
+# sensor = us100.US100UART(uart1)
 
 
 #DS18B20 temp sensor data line (yellow wire) connected to pin P8 (G15 on Expansion Board)
@@ -54,20 +54,20 @@ time.sleep(1)
 temp = round(temp.read_temp_async(), 2)
 
 # get the distance in millimeters from the sensor
-waterLevel = sensor.distance()
+# waterLevel = sensor.distance()
 
 print("Temp =")
 # #print(tempVal) # scale the value down to a more realistic level
 print(float(temp))
-print("Water Level = ")
-print(sensor.distance())
+# print("Water Level = ")
+# print(sensor.distance())
 # # 'f' = float value
 
 #s.send(struct.pack('f',float(12.3)) + struct.pack('i', int(1020)))
 try:
     print("sending data")
     # 'f' = float value, 'i' = unsigned integer
-    #s.send(struct.pack('f',float(temp)) + bytes([123]))
+    s.send(struct.pack('f',float(temp)) + bytes([123]))
 except Exception as error:
     print("unable to send data" + str(error))
     
