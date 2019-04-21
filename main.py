@@ -17,11 +17,13 @@ Modified code available at: https://github.com/conorf50/pycom-us100
 '''
 from network import Sigfox # sigfox libs
 import time 
-from machine import UART
+#from machine import UART # broken on this firmware revision
 import utime
-import us100
+#import us100
 import pycom
 from machine import Pin # listings for device pins
+from machine import ADC # 'substitute' for a temp sensor by using a pot connected to the ADC
+
 from onewire import DS18X20 # driver for the temperature sensor
 from onewire import OneWire # onewire driver for DS18B20 driver above
 import socket # sigfox
@@ -38,19 +40,28 @@ s.setblocking(True)
 s.setsockopt(socket.SOL_SIGFOX, socket.SO_RX, False)
 
 
-# The SiPy has two serial ports, one is used to communicate with the computer
-# the second is used here
+# # The SiPy has two serial ports, one is used to communicate with the computer
+# # the second is used here
 
-# Configure second UART bus on pins P3(TX1) and P4(RX1). Refer to datasheet if in doubt
-uart1 = machine.UART(1, baudrate=9600)
-sensor = us100.US100UART(uart1)
+# # Configure second UART bus on pins P3(TX1) and P4(RX1). Refer to datasheet if in doubt
+# uart1 = machine.UART(1, baudrate=9600)
+# sensor = us100.US100UART(uart1)
 
+#init the ADC
+adc = ADC(0)
+#set up the ADC on pin 13 with an 11db attenuation factor 
+#this means the max value will be 4095 at 3.3v
+adc_c = adc.channel(pin='P13', attn=ADC.ATTN_11DB)
+
+# take the value from the ADC, divide it by 100 to get a float value and round this to an integer
+waterLevel = round(adc_c.value()/100)
 
 #DS18B20 temp sensor data line (yellow wire) connected to pin P8 (G15 on Expansion Board)
 ow = OneWire(Pin('P8')) # breaks Sigfox connectivity
 temp = DS18X20(ow) 
 temp.start_conversion()
 time.sleep(1)
+# round the value to two decimal places
 temp = round(temp.read_temp_async(), 2)
 
 
@@ -58,13 +69,14 @@ print("Temp =")
 # #print(tempVal) # scale the value down to a more realistic level
 print(float(temp))
 
+print("Water Level = " + str(waterLevel))
 # # 'f' = float value
 
 #s.send(struct.pack('f',float(12.3)) + struct.pack('i', int(1020)))
 try:
     print("sending data")
     # 'f' = float value, 'i' = unsigned integer
-    s.send(struct.pack('f',float(temp)) + bytes([123]))
+    s.send(struct.pack('f',float(temp)) + bytes([waterLevel]))
 except Exception as error:
     print("unable to send data" + str(error))
     
