@@ -58,4 +58,4 @@ print(float(temp))
 print("sending data")
     # 'f' = float value, 'i' = unsigned integer
     #s.send(struct.pack('f',float(12.3)) + struct.pack('i', int(1020)))
-s.send(struct.pack('f',float(temp)) + bytes([12]))
+#s.send(struct.pack('f',float(temp)) + bytes([12]))
