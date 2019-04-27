@@ -85,15 +85,24 @@ while True:
         waterLevel = round(adc_c.value()/100)
 
         print("Temp =")
-        # #print(tempVal) # scale the value down to a more realistic level
         print(float(waterTemp))
 
         print("Water Level = " + str(waterLevel))
         pycom.rgbled(0x321000) # set LED to orange
         
-        # 'f' = float value, 'i' = unsigned integer
         try:
             print("sending data")
+            # 'f' = float value, 'i' = unsigned integer
+            '''
+                This will compress the data into the following structure
+                Byte | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 
+                     | Temp (uint16) |Lev|              
+                where the temp value occuipies bits 0 to 4 and the 
+                level value is bit 5.
+
+                The float is a 16bit signed float with little endian encoding
+                The level is simply a unsigned 8 bit integer
+            '''
             s.send(struct.pack('f',float(waterTemp)) + bytes([waterLevel]))
             pycom.rgbled(0x002000) # change LED to dim green colour
         except Exception as e:
