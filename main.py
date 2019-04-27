@@ -23,9 +23,9 @@ a water level sensor.
 '''
 from network import Sigfox # sigfox libs
 import time 
-#from machine import UART # broken on this firmware revision
+from machine import UART # broken on this firmware revision
 import utime
-#import us100
+import us100
 import pycom
 from machine import Pin # listings for device pins
 from machine import ADC # 'substitute' for a temp sensor by using a pot connected to the ADC
@@ -49,7 +49,9 @@ s.setblocking(True)
 # configure it as uplink only
 s.setsockopt(socket.SOL_SIGFOX, socket.SO_RX, False)
 
-
+'''
+Commented out because of firmware bug with SiPy
+'''
 # The SiPy has two serial ports, one is used to communicate with the computer
 # the second is used here
 
@@ -57,6 +59,9 @@ s.setsockopt(socket.SOL_SIGFOX, socket.SO_RX, False)
 # uart1 = machine.UART(1, baudrate=9600)
 # sensor = us100.US100UART(uart1)
 
+'''
+Using the ADC instead of a distance sensor to represent water level
+'''
 #init the ADC
 adc = ADC(0)
 #set up the ADC on pin 13 with an 11db attenuation factor 
@@ -69,16 +74,19 @@ adc_c = adc.channel(pin='P13', attn=ADC.ATTN_11DB)
 ow = OneWire(Pin('P8')) # breaks Sigfox connectivity on some firmwares!
 temp = DS18X20(ow) 
 
-# # 'f' = float value
+# 'f' = float value
 
-#s.send(struct.pack('f',float(12.3)) + struct.pack('i', int(1020)))
 while True:
 # run this in an infinite loop
     try:
         pycom.rgbled(0x220022) # set LED to purple
-        temp.start_conversion() # poll the sensor
-        time.sleep(1) # wait until sensor is ready
+        temp.start_conversion() # poll temp sensor
+        time.sleep(1) # wait until temp sensor is ready
         
+        # get the distance in millimeters from the sensor and divide it by 10
+        #y = sensor.distance()
+        #waterLevel = y/10
+
         # round the result value to two decimal places
         waterTemp = round(temp.read_temp_async(), 2)
         # take the value from the ADC, divide it by 100 to get a float value and round this to an integer
@@ -103,7 +111,7 @@ while True:
                 The float is a 16bit signed float with little endian encoding
                 The level is simply a unsigned 8 bit integer
             '''
-            s.send(struct.pack('f',float(waterTemp)) + bytes([waterLevel]))
+            s.send(struct.pack('f',float(waterTemp)) + bytes([waterLevel])) # send to Sigfox using a blocking socket
             pycom.rgbled(0x002000) # change LED to dim green colour
         except Exception as e:
             print("unable to send data" + str(e))
