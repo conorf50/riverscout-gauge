@@ -108,7 +108,7 @@ while True:
                 where the temp value occuipies bits 0 to 4 and the 
                 level value is bit 5.
 
-                The float is a 16bit signed float with little endian encoding
+                The float is a signed float with little endian encoding
                 The level is simply a unsigned 8 bit integer
             '''
             s.send(struct.pack('f',float(waterTemp)) + bytes([waterLevel])) # send to Sigfox using a blocking socket
@@ -121,5 +121,7 @@ while True:
         time.sleep(delayVal) # wait 30s before reading values again        
     except Exception as error:
         print("reading data failed" + str(error))
+        pycom.rgbled(0xFF0000) # turn the LED to red to signal something has gone wrong  
+
         break
     
