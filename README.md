@@ -37,7 +37,6 @@ For a better look at the protocol, refer to [this video](https://www.youtube.com
 
 ### Sensors Used
 #### US-100
-US-100 ultrasonic sensor
 The US-100 is an ultrasonic distance sensor that measures distance by emitting 40kHz pulses and measuring the time it takes to detect them reflecting back.
 It has a range of between 20 to 450 cm, however it loses accuracy after 250cm. 
 
@@ -75,8 +74,8 @@ print(float(waterTemp)) // print to console
 
 The SiPy runs code written in Micropython which is an embedded derivative of CPython (standard Python). Micropython aims to provide most of the features of Python 3, with some differences that are documented here: https://docs.micropython.org/en/latest/genrst/index.html
 
-The SiPy runs Pycom’s own Micropython distribution. When powered on, the interpreter will look for a file called ‘boot.py’ If this does not exist, the board will not be able to connect to the computer via serial. A boot.py file is provided as standard.
-The boot.py file sets up the serial terminal and specifies the main code file (usually called main.py). It runs on device startup similar to a main.c file in C / Arduino. Its purpose is to perform board initialization and point to the main file.
+The SiPy runs Pycom’s own Micropython distribution. When powered on, the interpreter will look for a file called ```boot.py``` If this does not exist, the board will not be able to connect to the computer via serial. A boot file is provided as standard so it is not necessary to provide it (unless modifications need to be made).
+The boot file sets up the serial terminal and specifies the main code file (usually called ```main.py```). It runs on device startup similar to a ```main.c``` file in C/Arduino/conventional microcontrollers. Its purpose is to perform board initialization and point to the main file.
 
 The other important file is ```main.py```. This is where most of the processing gets done.
 
