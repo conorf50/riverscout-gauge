@@ -1,3 +1,10 @@
+# UPDATE 8/Nov/2022
+Pycom Ltd has gone into receivership, and its future is unknown.
+The SiPy and other 1st generation Pycom dev boards are also being discontinued.
+The code here may or may not work with future Pycom products and is provided for reference only.
+
+
+
 
 # Riverscout - A distributed envrionmental monitoring system
 
